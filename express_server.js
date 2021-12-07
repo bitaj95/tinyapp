@@ -14,7 +14,7 @@ function generateRandomString() {
   for (let i = 0; i <= 6; i++) {
     randomString += characters.charAt(Math.floor(Math.random() * characters.length));
   }
-  return result;
+  return randomString;
 }
 
 const bodyParser = require("body-parser");
@@ -42,7 +42,8 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);
+  let urlShort = generateRandomString();
+  console.log(req.body, urlShort);
   res.send("Ok");
 });
 
