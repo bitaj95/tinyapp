@@ -36,7 +36,7 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-//Get request handler for "/urls"
+//GET request handler for "/urls"
 app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
@@ -60,7 +60,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${urlShort}`)
 });
 
-//Browser makes a GET request to /urls/:shortURL
+//Browser makes a GET request to /urls/:shortURL, renders urls_show template
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL, 
@@ -88,6 +88,12 @@ app.post("/urls/:shortURL", (req, res) => {
 app.post("/login", (req, res) => {
   res.cookie("username", req.body.username)
   res.redirect("/urls");
+});
+
+//GET for /register endpoint, returns urls_registration template
+app.get("/register", (req, res) => {
+  const templateVars = {username: req.cookies["username"]};
+  res.render("urls_registration", templateVars);
 });
 
 //Log user out and clear cookies
