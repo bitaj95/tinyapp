@@ -12,7 +12,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-const users = [
+const users = 
   {
   "userRandomID": {
     id: "userRandomID", 
@@ -25,7 +25,7 @@ const users = [
     email: "user2@example.com", 
     password: "dishwasher-funk"
   }
-}]
+}
 
 function generateRandomString() {
   const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -57,14 +57,14 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_index", templateVars);
 });
 
 //GET route to present new URL form to user
 app.get("/urls/new", (req, res) => {
-  let templateVars = {username: req.cookies["username"]};
+  let templateVars = {user: users[req.cookies["user_id"]]};
   res.render("urls_new", templateVars);
 });
 
@@ -82,7 +82,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_show", templateVars);
 });
@@ -101,21 +101,20 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/longURL");
 });
 
-//Sets a cookie 'username' to value submitted via login form; redirects to /urls
+//GET ogin form; redirects to /urls
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username)
   res.redirect("/urls");
 });
 
 //GET for /register endpoint
 app.get("/register", (req, res) => {
-  const templateVars = {username: req.cookies["username"]};
+  const templateVars = {user: users[req.cookies["user_id"]]};
   res.render("urls_registration", templateVars);
 });
 
 //Log Out & Clear Cookies
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
@@ -125,16 +124,14 @@ app.post("/register", (req, res) => {
   const newPassword = req.body.password;
   const newID = generateRandomString();
   
-  const newUser = {};
-  newUser[newID] = {
-    id: `${newID}`, 
-    email: `${newEmail}`,
-    password: `${newPassword}`
+  users[newID] = {
+    id: newID, 
+    email: newEmail,
+    password: newPassword
   };
-  users.push(newUser);
+
   res.cookie("user_id", newID);
   res.redirect("/urls");
-  console.log("Updated Users:", users);
 });
 
 //Redirect any request to "/u/:shortURL" to its longURL
