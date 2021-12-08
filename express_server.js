@@ -80,7 +80,13 @@ app.post("/urls/:shortURL", (req, res) => {
 
 //Sets a cookie named 'username' to the value submitted in the request body via the login form; then redirects to /urls page.
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username)
+  res.cookie("username", req.body.username)
+  res.redirect("/urls");
+});
+
+//Log user out and clear cookies
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
   res.redirect("/urls");
 });
 
