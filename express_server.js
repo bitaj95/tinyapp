@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
+const cookieParser = require('cookie-parser')
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -68,6 +69,11 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/urls");
 });
 
+//Sets a cookie named username to the value submitted in the request body via the login form; then redirects back to /urls page.
+app.post("/login", (req, res) => {
+  res.cookie('username', req.body.username)
+  res.redirect("/urls");
+});
 
 app.get("/u/:shortURL", (req, res) => {
   res.redirect(urlDatabase[req.params.shortURL]);
