@@ -1,14 +1,31 @@
 const express = require("express");
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080; 
 app.set("view engine", "ejs");
 const cookieParser = require('cookie-parser')
 app.use(cookieParser())
 
+
+//DATA
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+const users = [
+  {
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com",
+    password: "purple-monkey"
+  },
+
+  "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}]
 
 function generateRandomString() {
   const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -36,7 +53,7 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-//GET request handler for "/urls"
+//GET request handler for "/urls" page, which displays my URLS 
 app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
@@ -45,7 +62,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-//GET route to render urls_new template in browser, to present the form to the user
+//GET route to present new URL form to user
 app.get("/urls/new", (req, res) => {
   let templateVars = {username: req.cookies["username"]};
   res.render("urls_new", templateVars);
@@ -84,22 +101,40 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/longURL");
 });
 
-//Sets a cookie named 'username' to value submitted in request body via login form; then redirects to /urls
+//Sets a cookie 'username' to value submitted via login form; redirects to /urls
 app.post("/login", (req, res) => {
   res.cookie("username", req.body.username)
   res.redirect("/urls");
 });
 
-//GET for /register endpoint, returns urls_registration template
+//GET for /register endpoint
 app.get("/register", (req, res) => {
   const templateVars = {username: req.cookies["username"]};
   res.render("urls_registration", templateVars);
 });
 
-//Log user out and clear cookies
+//Log Out & Clear Cookies
 app.post("/logout", (req, res) => {
   res.clearCookie("username");
   res.redirect("/urls");
+});
+
+//Registration Handler
+app.post("/register", (req, res) => {
+  const newEmail = req.body.email;
+  const newPassword = req.body.password;
+  const newID = generateRandomString();
+  
+  const newUser = {};
+  newUser[newID] = {
+    id: `${newID}`, 
+    email: `${newEmail}`,
+    password: `${newPassword}`
+  };
+  users.push(newUser);
+  res.cookie("user_id", newID);
+  res.redirect("/urls");
+  console.log("Updated Users:", users);
 });
 
 //Redirect any request to "/u/:shortURL" to its longURL
