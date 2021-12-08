@@ -22,10 +22,12 @@ function generateRandomString() {
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+//Home Page
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+///urls.json will show a JSON string representing the entire urlDatabase object
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 }); 
@@ -34,20 +36,22 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+//Get request handler for "/urls"
 app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
     username: req.cookies["username"]
   };
-
   res.render("urls_index", templateVars);
 });
 
+//GET route to render urls_new template in browser, to present the form to the user
 app.get("/urls/new", (req, res) => {
   let templateVars = {username: req.cookies["username"]};
   res.render("urls_new", templateVars);
 });
 
+//Generates new shortURL, adds to database.
 app.post("/urls", (req, res) => {
   console.log(req.body);
   let urlShort = generateRandomString();
@@ -56,6 +60,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${urlShort}`)
 });
 
+//Browser makes a GET request to /urls/:shortURL
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL, 
@@ -65,6 +70,7 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+//Removes existing shortened URLs from database
 app.post("/urls/:shortURL/delete", (req, res) => {
   shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
@@ -78,7 +84,7 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/longURL");
 });
 
-//Sets a cookie named 'username' to the value submitted in the request body via the login form; then redirects to /urls page.
+//Sets a cookie named 'username' to value submitted in request body via login form; then redirects to /urls
 app.post("/login", (req, res) => {
   res.cookie("username", req.body.username)
   res.redirect("/urls");
@@ -90,6 +96,7 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+//Redirect any request to "/u/:shortURL" to its longURL
 app.get("/u/:shortURL", (req, res) => {
   res.redirect(urlDatabase[req.params.shortURL]);
 });
