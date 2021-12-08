@@ -75,7 +75,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   shortURL = req.params.shortURL;
   urlDatabase[shortURL] = req.body.longURL;
-  res.redirect("/urls");
+  res.redirect("/longURL");
 });
 
 //Sets a cookie named 'username' to the value submitted in the request body via the login form; then redirects to /urls page.
