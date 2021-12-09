@@ -3,7 +3,6 @@ const app = express();
 const PORT = 8080; 
 const cookieParser = require('cookie-parser')
 const bodyParser = require("body-parser");
-const e = require("express");
 app.set("view engine", "ejs");
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
@@ -35,8 +34,9 @@ const users =
   }
 }
 
-//HELPER FUNCTIONS
-
+//
+//HELPER FUNCTION
+//
 const getUserByEmail = (email) => {
   const userIDs = Object.keys(users);
   const userKeys = Object.values(users);
@@ -65,12 +65,10 @@ function generateRandomString() {
   return randomString;
 }
 
-//Home Page
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-///urls.json will show a JSON string representing the entire urlDatabase object
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 }); 
@@ -79,7 +77,6 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-//GET request handler for "/urls" page, which displays my URLS 
 app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
@@ -88,13 +85,12 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-//GET route to present new URL form to user
 app.get("/urls/new", (req, res) => {
   let templateVars = {user: users[req.cookies["user_id"]]};
   res.render("urls_new", templateVars);
 });
 
-//Generates new shortURL, adds to database.
+//Generate new shortURL, adds to database.
 app.post("/urls", (req, res) => {
   console.log(req.body);
   let urlShort = generateRandomString();
@@ -103,7 +99,6 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${urlShort}`)
 });
 
-//Browser makes a GET request to /urls/:shortURL, renders urls_show template
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL, 
@@ -120,21 +115,18 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-//POST route that updates a URL resource
+//Updates a URL resource
 app.post("/urls/:shortURL", (req, res) => {
   shortURL = req.params.shortURL;
   urlDatabase[shortURL] = req.body.longURL;
-  res.redirect("/longURL");
+  res.redirect("/urls");
 });
 
-
-//GET request for /register
 app.get("/register", (req, res) => {
   const templateVars = {user: users[req.cookies["user_id"]]};
   res.render("urls_registration", templateVars);
 });
 
-//GET request for /login 
 app.get("/login", (req, res) => {
   const templateVars = {user: users[req.cookies["user_id"]]};
   res.render("urls_login", templateVars);
@@ -147,11 +139,9 @@ app.post("/login", (req, res) => {
   const checkDatabase = getUserByEmail(emailEntered);
 
   if (!checkDatabase.email) {
-    res.send("Email was not found.")
-    res.sendStatus(403);
+    res.status(403).send("Email was not found.");
   } else if (checkDatabase.password !== passwordEntered) {
-    res.send("Password was incorrect.")
-    res.sendStatus(403);
+    res.status(403).send("Password was incorrect.");
   } else {
     const userID = checkDatabase.id;
     res.cookie("user_id", userID);
@@ -172,24 +162,18 @@ app.post("/register", (req, res) => {
   const newID = generateRandomString();
 
   if (!newEmail || !newPassword) {
-    res.send("Email and/or password cannot be left blank.")
-    res.sendStatus(400);
+    res.status(400).send("Email and/or password cannot be left blank.");
   } else if (getUserByEmail(newEmail).email) {
-    res.send("This email is already registered with an account.")
-    res.sendStatus(400);
+    res.status(400).send("This email is already registered with an account.");
   } else {
     users[newID] = {
       id: newID, 
       email: newEmail,
       password: newPassword
     };
-
   };
-
   res.cookie("user_id", newID);
   res.redirect("/urls");
-  //console.log("getUserByEMAIL", getUserByEmail("user2RandomID").email);
-  
 });
 
 //Redirect any request to "/u/:shortURL" to its longURL
