@@ -41,7 +41,7 @@ const users =
   }
 }
 
-//HELPER FUNCTION
+//HELPER FUNCTIONs
 const getUserByEmail = (email) => {
   const userIDs = Object.keys(users);
   const userKeys = Object.values(users);
@@ -59,6 +59,12 @@ const getUserByEmail = (email) => {
       };
     });
     return returnUser; 
+}
+
+const urlsForUser = (id) => {
+  const shortURLs = Object.keys(urlDatabase);
+  const filtered = shortURLs.filter( url => urlDatabase[url].id === id);
+  return filtered;
 }
 
 function generateRandomString() {
