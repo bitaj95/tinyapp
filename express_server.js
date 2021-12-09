@@ -60,7 +60,7 @@ const getUserByEmail = (email) => {
     });
     return returnUser; 
 }
-
+//Returns the URLs where the userID === id of logged-in user.
 const urlsForUser = (id) => {
   const shortURLs = Object.keys(urlDatabase);
   const filtered = shortURLs.filter( url => urlDatabase[url].id === id);
@@ -134,7 +134,13 @@ app.get("/urls/:shortURL", (req, res) => {
     longURL: urlDatabase[req.params.shortURL].longURL,
     user: users[req.cookies["user_id"]]
   };
-  res.render("urls_show", templateVars);
+  if (!templateVars.user) {
+    res.status(401).send("Please sign in to view this page");
+  } else if (req.cookies["user_id"] === urlDatabase[req.params.shortURL].userID) {
+    res.render("urls_show", templateVars);
+  } else {
+    res.status(401).send("Sorry, this is not your URL to edit.");
+  }
 });
 
 //Removes existing shortened URLs from db
