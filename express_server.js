@@ -87,16 +87,27 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   let templateVars = {user: users[req.cookies["user_id"]]};
-  res.render("urls_new", templateVars);
+  if (!templateVars.user) {
+    res.redirect("/urls");
+  } else {
+    res.render("urls_new", templateVars);
+  }
 });
 
 //Generate new shortURL, adds to database.
 app.post("/urls", (req, res) => {
-  console.log(req.body);
-  let urlShort = generateRandomString();
-  let urlLong = req.body.longURL;
-  urlDatabase[urlShort] = [urlLong]; 
-  res.redirect(`/urls/${urlShort}`)
+  const status = users[req.cookies["user_id"]];
+
+  if (!status) {
+    res.status(401).send("Please sign in to add shorten a URL");
+  } else {
+    console.log(req.body);
+    let urlShort = generateRandomString();
+    let urlLong = req.body.longURL;
+    urlDatabase[urlShort] = [urlLong]; 
+    res.redirect(`/urls/${urlShort}`)
+  }
+  
 });
 
 app.get("/urls/:shortURL", (req, res) => {
