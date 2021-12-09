@@ -41,9 +41,7 @@ const users =
   }
 }
 
-//
 //HELPER FUNCTION
-//
 const getUserByEmail = (email) => {
   const userIDs = Object.keys(users);
   const userKeys = Object.values(users);
@@ -92,7 +90,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-//ADDING NEW URLS
+//ADD NEW URL
 app.get("/urls/new", (req, res) => {
   const templateVars = {user: users[req.cookies["user_id"]]};
   if (!templateVars.user) {
@@ -102,7 +100,7 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
-//Generate new shortURL, adds to database.
+//Generate new shortURL, add to db.
 app.post("/urls", (req, res) => {
   console.log(req.body);
   const templateVars = {user: users[req.cookies["user_id"]]};
@@ -133,28 +131,20 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-//Removes existing shortened URLs from database
+//Removes existing shortened URLs from db
 app.post("/urls/:shortURL/delete", (req, res) => {
   shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
   res.redirect("/urls");
 });
 
-//Updates a URL resource
+//Updates URL resource
 app.post("/urls/:shortURL", (req, res) => {
   shortURL = req.params.shortURL;
   urlDatabase[shortURL].longURL = req.body.longURL;
   res.redirect("/urls");
 });
 
-app.get("/register", (req, res) => {
-  const templateVars = {user: users[req.cookies["user_id"]]};
-  if (templateVars.user) {
-    res.redirect("/urls");
-  } else {
-    res.render("urls_registration", templateVars);
-  }
-});
 
 //LOGIN
 app.get("/login", (req, res) => {
@@ -188,7 +178,16 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
-//REGISTER
+//REGISTRATION
+app.get("/register", (req, res) => {
+  const templateVars = {user: users[req.cookies["user_id"]]};
+  if (templateVars.user) {
+    res.redirect("/urls");
+  } else {
+    res.render("urls_registration", templateVars);
+  }
+});
+
 app.post("/register", (req, res) => {
   const newEmail = req.body.email;
   const newPassword = req.body.password;
