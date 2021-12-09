@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080; 
 const cookieParser = require('cookie-parser')
 const bodyParser = require("body-parser");
+const e = require("express");
 app.set("view engine", "ejs");
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
@@ -25,10 +26,16 @@ const users =
     id: "user2RandomID", 
     email: "user2@example.com", 
     password: "dishwasher-funk"
+  },
+
+  "111111": {
+    id: "111111", 
+    email: "hi@hi.com", 
+    password: "hi"
   }
 }
 
-//HELPER FUNCTION
+//HELPER FUNCTIONS
 
 const getUserByEmail = (email) => {
   const userIDs = Object.keys(users);
@@ -42,9 +49,10 @@ const getUserByEmail = (email) => {
     userIDs.forEach( id => {
       if (users[id].email === email) {
         returnUser.email = email;
+        returnUser.password = users[id].password;
+        returnUser.id = id;
       };
     });
-
     return returnUser; 
 }
 
@@ -119,11 +127,6 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/longURL");
 });
 
-//GET request for login
-app.post("/login", (req, res) => {
-  const templateVars = {user: users[req.cookies["user_id"]]};
-  res.redirect("/urls");
-});
 
 //GET request for /register
 app.get("/register", (req, res) => {
@@ -137,13 +140,30 @@ app.get("/login", (req, res) => {
   res.render("urls_login", templateVars);
 });
 
+//Login Handler
+app.post("/login", (req, res) => {
+  const emailEntered = req.body.email;
+  const passwordEntered = req.body.password;
+  const checkDatabase = getUserByEmail(emailEntered);
+
+  if (!checkDatabase.email) {
+    res.send("Email was not found.")
+    res.sendStatus(403);
+  } else if (checkDatabase.password !== passwordEntered) {
+    res.send("Password was incorrect.")
+    res.sendStatus(403);
+  } else {
+    const userID = checkDatabase.id;
+    res.cookie("user_id", userID);
+    res.redirect("/urls");
+  }
+});
 
 //Log Out & Clear Cookies
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/urls");
 });
-
 
 //Registration Handler
 app.post("/register", (req, res) => {
@@ -163,6 +183,7 @@ app.post("/register", (req, res) => {
       email: newEmail,
       password: newPassword
     };
+
   };
 
   res.cookie("user_id", newID);
