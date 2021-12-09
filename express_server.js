@@ -119,8 +119,9 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/longURL");
 });
 
-//GET ogin form; redirects to /urls
+//GET request for login
 app.post("/login", (req, res) => {
+  const templateVars = {user: users[req.cookies["user_id"]]};
   res.redirect("/urls");
 });
 
@@ -136,11 +137,13 @@ app.get("/login", (req, res) => {
   res.render("urls_login", templateVars);
 });
 
+
 //Log Out & Clear Cookies
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/urls");
 });
+
 
 //Registration Handler
 app.post("/register", (req, res) => {

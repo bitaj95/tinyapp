@@ -17,8 +17,11 @@
         <button type="submit" class="btn btn-primary ">Log Out</button>
       </form>
     <% } else { %>
-      <form method="POST" action="/login">
-        <button type="submit" class="btn btn-primary">Sign In?</button>
+      <form method="POST" action="/login" style="padding: 1em;">
+        <button type="submit" class="btn btn-primary">Sign In</button>
+      </form>
+      <form method="POST" action="/register" style="padding: 1em;">
+        <button type="submit" class="btn btn-primary">Registration</button>
       </form>
     <% } %>
   </nav>
