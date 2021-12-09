@@ -124,15 +124,23 @@ app.post("/urls/:shortURL", (req, res) => {
 
 app.get("/register", (req, res) => {
   const templateVars = {user: users[req.cookies["user_id"]]};
-  res.render("urls_registration", templateVars);
+  if (templateVars.user) {
+    res.redirect("/urls");
+  } else {
+    res.render("urls_registration", templateVars);
+  }
 });
 
+//LOGIN
 app.get("/login", (req, res) => {
   const templateVars = {user: users[req.cookies["user_id"]]};
-  res.render("urls_login", templateVars);
+  if (templateVars.user) {
+    res.redirect("/urls");
+  } else {
+    res.render("urls_login", templateVars);
+  }
 });
 
-//Login Handler
 app.post("/login", (req, res) => {
   const emailEntered = req.body.email;
   const passwordEntered = req.body.password;
@@ -149,13 +157,13 @@ app.post("/login", (req, res) => {
   }
 });
 
-//Log Out & Clear Cookies
+//LOG OUT
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
-//Registration Handler
+//REGISTER
 app.post("/register", (req, res) => {
   const newEmail = req.body.email;
   const newPassword = req.body.password;
