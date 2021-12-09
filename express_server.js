@@ -16,7 +16,7 @@ const urlDatabase = {
   },
   i3BoGr: {
       longURL: "https://www.google.ca",
-      userID: "aJ48lW"
+      userID: "111111"
   }
 };
 
@@ -45,11 +45,7 @@ const users =
 const getUserByEmail = (email) => {
   const userIDs = Object.keys(users);
   const userKeys = Object.values(users);
-  const allEmails = userKeys.map( userInfo => userInfo.email);
   const returnUser = {};
-
-  console.log("all values***", userKeys );
-  console.log("all emails", allEmails);
   
     userIDs.forEach( id => {
       if (users[id].email === email) {
@@ -63,7 +59,12 @@ const getUserByEmail = (email) => {
 //Returns the URLs where the userID === id of logged-in user.
 const urlsForUser = (id) => {
   const shortURLs = Object.keys(urlDatabase);
-  const filtered = shortURLs.filter( url => urlDatabase[url].id === id);
+  const filtered = {}
+  shortURLs.forEach( url => {
+    if ( urlDatabase[url].userID === id){
+      filtered[url] = urlDatabase[url];
+    };
+  });
   return filtered;
 }
 
@@ -90,7 +91,7 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUser(req.cookies["user_id"]),
     user: users[req.cookies["user_id"]]
   };
   res.render("urls_index", templateVars);
@@ -117,13 +118,10 @@ app.post("/urls", (req, res) => {
     const urlShort = generateRandomString();
     const urlLong = req.body.longURL;
 
-    console.log("urlLong", urlLong);
-
     urlDatabase[urlShort] = {
       longURL: urlLong,
       userID: req.cookies["user_id"]
     } 
-    console.log(urlDatabase);
     res.redirect(`/urls/${urlShort}`)
   }
 });
@@ -152,7 +150,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 //Updates URL resource
 app.post("/urls/:shortURL", (req, res) => {
-  shortURL = req.params.shortURL;
+  const shortURL = req.params.shortURL;
   urlDatabase[shortURL].longURL = req.body.longURL;
   res.redirect("/urls");
 });
@@ -216,6 +214,8 @@ app.post("/register", (req, res) => {
       password: newPassword
     };
   };
+
+  console.log("filtered", urlsForUser("111111"));
   res.cookie("user_id", newID);
   res.redirect("/urls");
 });
