@@ -1,14 +1,12 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; 
-const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
 const bcrypt = require('bcryptjs');
 const cookieSession = require('cookie-session');
-const {getUserByEmail, urlsForUser} = require("./helpers.js");
+const {getUserByEmail, urlsForUser, generateRandomString} = require("./helpers.js");
 
 app.set("view engine", "ejs");
-app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
@@ -16,47 +14,8 @@ app.use(cookieSession({
 }))
 
 //DATA
-const urlDatabase = {
-
-  b6UTxQ: {
-      longURL: "https://www.tsn.ca",
-      userID: "aJ48lW"
-  },
-  i3BoGr: {
-      longURL: "https://www.google.ca",
-      userID: "111111"
-  }
-};
-
-const users = 
-  {
-  "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com",
-    password: "purple-monkey"
-  },
-
-  "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
-    password: "dishwasher-funk"
-  },
-
-  "111111": {
-    id: "111111", 
-    email: "hi@hi.com", 
-    password: "hi"
-  }
-}
-
-function generateRandomString() {
-  const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let randomString = "";
-  for (let i = 0; i < 6; i++) {
-    randomString += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return randomString;
-}
+const urlDatabase = {};
+const users = {}
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -158,7 +117,6 @@ app.post("/login", (req, res) => {
   } else {
     const userID = checkDatabase.id;
     req.session["user_id"] = userID;
-    //res.cookie("user_id", userID);
     res.redirect("/urls");
   }
 });
@@ -198,7 +156,6 @@ app.post("/register", (req, res) => {
   };
 
   req.session["user_id"] = newID;
-  //res.cookie("user_id", newID);
   res.redirect("/urls");
 });
 
