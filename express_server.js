@@ -1,10 +1,12 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; 
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
 const bcrypt = require('bcryptjs');
-const cookieSession = require('cookie-session')
+const cookieSession = require('cookie-session');
+const {getUserByEmail, urlsForUser} = require("./helpers.js");
+
 app.set("view engine", "ejs");
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
@@ -47,33 +49,6 @@ const users =
   }
 }
 
-//HELPER FUNCTIONs
-const getUserByEmail = (email) => {
-  const userIDs = Object.keys(users);
-  const userKeys = Object.values(users);
-  const returnUser = {};
-  
-    userIDs.forEach( id => {
-      if (users[id].email === email) {
-        returnUser.email = email;
-        returnUser.password = users[id].password;
-        returnUser.id = id;
-      };
-    });
-    return returnUser; 
-}
-//Returns the URLs where the userID === id of logged-in user.
-const urlsForUser = (id) => {
-  const shortURLs = Object.keys(urlDatabase);
-  const filtered = {}
-  shortURLs.forEach( url => {
-    if ( urlDatabase[url].userID === id){
-      filtered[url] = urlDatabase[url];
-    };
-  });
-  return filtered;
-}
-
 function generateRandomString() {
   const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
   let randomString = "";
@@ -97,7 +72,7 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const templateVars = {
-    urls: urlsForUser(req.session.user_id),
+    urls: urlsForUser(req.session.user_id, urlDatabase),
     user: users[req.session.user_id]
   };
   res.render("urls_index", templateVars);
@@ -174,7 +149,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const emailEntered = req.body.email;
   const passwordEntered = req.body.password;
-  const checkDatabase = getUserByEmail(emailEntered);
+  const checkDatabase = getUserByEmail(emailEntered, users);
 
   if (!checkDatabase.email) {
     res.status(403).send("Email was not found.");
@@ -212,7 +187,7 @@ app.post("/register", (req, res) => {
 
   if (!newEmail || !newPassword) {
     res.status(400).send("Email and/or password cannot be left blank.");
-  } else if (getUserByEmail(newEmail).email) {
+  } else if (getUserByEmail(newEmail, users).email) {
     res.status(400).send("This email is already registered with an account.");
   } else {
     users[newID] = {
@@ -222,7 +197,6 @@ app.post("/register", (req, res) => {
     };
   };
 
-  console.log("filtered", urlsForUser("111111"));
   req.session["user_id"] = newID;
   //res.cookie("user_id", newID);
   res.redirect("/urls");
