@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080; 
 const cookieParser = require('cookie-parser')
 const bodyParser = require("body-parser");
+const bcrypt = require('bcryptjs');
 app.set("view engine", "ejs");
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
@@ -155,7 +156,6 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/urls");
 });
 
-
 //LOGIN
 app.get("/login", (req, res) => {
   const templateVars = {user: users[req.cookies["user_id"]]};
@@ -173,7 +173,7 @@ app.post("/login", (req, res) => {
 
   if (!checkDatabase.email) {
     res.status(403).send("Email was not found.");
-  } else if (checkDatabase.password !== passwordEntered) {
+  } else if (!bcrypt.compareSync( passwordEntered, checkDatabase.password)) {
     res.status(403).send("Password was incorrect.");
   } else {
     const userID = checkDatabase.id;
@@ -201,6 +201,7 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const newEmail = req.body.email;
   const newPassword = req.body.password;
+  const hashedPassword = bcrypt.hashSync(newPassword, 10);
   const newID = generateRandomString();
 
   if (!newEmail || !newPassword) {
@@ -211,7 +212,7 @@ app.post("/register", (req, res) => {
     users[newID] = {
       id: newID, 
       email: newEmail,
-      password: newPassword
+      password: hashedPassword
     };
   };
 
