@@ -8,6 +8,10 @@ const cookieSession = require('cookie-session')
 app.set("view engine", "ejs");
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieSession({
+  name: 'session',
+  keys: [ "key1", "key2"],
+}))
 
 //DATA
 const urlDatabase = {
@@ -93,15 +97,15 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const templateVars = {
-    urls: urlsForUser(req.cookies["user_id"]),
-    user: users[req.cookies["user_id"]]
+    urls: urlsForUser(req.session.user_id),
+    user: users[req.session.user_id]
   };
   res.render("urls_index", templateVars);
 });
 
 //ADD NEW URL
 app.get("/urls/new", (req, res) => {
-  const templateVars = {user: users[req.cookies["user_id"]]};
+  const templateVars = {user: users[req.session.user_id]};
   if (!templateVars.user) {
     res.redirect("/urls");
   } else {
@@ -112,17 +116,17 @@ app.get("/urls/new", (req, res) => {
 //Generate new shortURL, add to db.
 app.post("/urls", (req, res) => {
   console.log(req.body);
-  const templateVars = {user: users[req.cookies["user_id"]]};
+  const templateVars = {user: users[req.session.user_id]};
 
   if (!templateVars.user) {
-    res.status(401).send("Please sign in to add shorten a URL");
+    res.status(401).send("Please sign in to shorten a URL");
   } else {
     const urlShort = generateRandomString();
     const urlLong = req.body.longURL;
 
     urlDatabase[urlShort] = {
       longURL: urlLong,
-      userID: req.cookies["user_id"]
+      userID: req.session.user_id
     } 
     res.redirect(`/urls/${urlShort}`)
   }
@@ -132,11 +136,11 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL].longURL,
-    user: users[req.cookies["user_id"]]
+    user: users[req.session.user_id]
   };
   if (!templateVars.user) {
     res.status(401).send("Please sign in to view this page");
-  } else if (req.cookies["user_id"] === urlDatabase[req.params.shortURL].userID) {
+  } else if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
     res.render("urls_show", templateVars);
   } else {
     res.status(401).send("Sorry, this is not your URL to edit.");
@@ -159,7 +163,7 @@ app.post("/urls/:shortURL", (req, res) => {
 
 //LOGIN
 app.get("/login", (req, res) => {
-  const templateVars = {user: users[req.cookies["user_id"]]};
+  const templateVars = {user: users[req.session.user_id]};
   if (templateVars.user) {
     res.redirect("/urls");
   } else {
@@ -178,20 +182,21 @@ app.post("/login", (req, res) => {
     res.status(403).send("Password was incorrect.");
   } else {
     const userID = checkDatabase.id;
-    res.cookie("user_id", userID);
+    req.session["user_id"] = userID;
+    //res.cookie("user_id", userID);
     res.redirect("/urls");
   }
 });
 
 //LOG OUT
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = null;
   res.redirect("/urls");
 });
 
 //REGISTRATION
 app.get("/register", (req, res) => {
-  const templateVars = {user: users[req.cookies["user_id"]]};
+  const templateVars = {user: users[req.session.user_id]};
   if (templateVars.user) {
     res.redirect("/urls");
   } else {
@@ -218,7 +223,8 @@ app.post("/register", (req, res) => {
   };
 
   console.log("filtered", urlsForUser("111111"));
-  res.cookie("user_id", newID);
+  req.session["user_id"] = newID;
+  //res.cookie("user_id", newID);
   res.redirect("/urls");
 });
 
