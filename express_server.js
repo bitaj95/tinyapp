@@ -124,10 +124,16 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
-//GET for /register endpoint
+//GET request for /register
 app.get("/register", (req, res) => {
   const templateVars = {user: users[req.cookies["user_id"]]};
   res.render("urls_registration", templateVars);
+});
+
+//GET request for /login 
+app.get("/login", (req, res) => {
+  const templateVars = {user: users[req.cookies["user_id"]]};
+  res.render("urls_login", templateVars);
 });
 
 //Log Out & Clear Cookies
