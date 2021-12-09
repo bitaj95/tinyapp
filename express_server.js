@@ -9,8 +9,15 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 //DATA
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+
+  b6UTxQ: {
+      longURL: "https://www.tsn.ca",
+      userID: "aJ48lW"
+  },
+  i3BoGr: {
+      longURL: "https://www.google.ca",
+      userID: "aJ48lW"
+  }
 };
 
 const users = 
@@ -85,8 +92,9 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+//ADDING NEW URLS
 app.get("/urls/new", (req, res) => {
-  let templateVars = {user: users[req.cookies["user_id"]]};
+  const templateVars = {user: users[req.cookies["user_id"]]};
   if (!templateVars.user) {
     res.redirect("/urls");
   } else {
@@ -96,24 +104,30 @@ app.get("/urls/new", (req, res) => {
 
 //Generate new shortURL, adds to database.
 app.post("/urls", (req, res) => {
-  const status = users[req.cookies["user_id"]];
+  console.log(req.body);
+  const templateVars = {user: users[req.cookies["user_id"]]};
 
-  if (!status) {
+  if (!templateVars.user) {
     res.status(401).send("Please sign in to add shorten a URL");
   } else {
-    console.log(req.body);
-    let urlShort = generateRandomString();
-    let urlLong = req.body.longURL;
-    urlDatabase[urlShort] = [urlLong]; 
+    const urlShort = generateRandomString();
+    const urlLong = req.body.longURL;
+
+    console.log("urlLong", urlLong);
+
+    urlDatabase[urlShort] = {
+      longURL: urlLong,
+      userID: req.cookies["user_id"]
+    } 
+    console.log(urlDatabase);
     res.redirect(`/urls/${urlShort}`)
   }
-  
 });
 
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL].longURL,
     user: users[req.cookies["user_id"]]
   };
   res.render("urls_show", templateVars);
@@ -129,7 +143,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //Updates a URL resource
 app.post("/urls/:shortURL", (req, res) => {
   shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL].longURL = req.body.longURL;
   res.redirect("/urls");
 });
 
