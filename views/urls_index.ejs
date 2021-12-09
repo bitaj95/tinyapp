@@ -30,12 +30,12 @@
               <td><%= urls[url].longURL %></td>
               <td>
                 <form method="GET" action="/urls/<%= url %>">
-                  <input type="submit" value = Edit>
+                  <button type="submit" class="btn btn-primary" value = Edit> Edit </button>
                 </form>
               </td>
               <td>
                 <form method="POST" action="/urls/<%= url %>/delete">
-                  <input type="submit" value = Delete>
+                  <button type="submit" class="btn btn-primary" value = Delete> Delete </button>
                 </form>
               </td>
             </tr>
@@ -43,23 +43,10 @@
           </tbody>
         </table>
         <% } else { %>
-          <div style="margin: 1em;" class="row justify-content-center">
-            <div class="card" style="border-radius: 15px;">
-              <h3 class="text-center mb-5">Please sign in to start using TinyApp!</h3>
-              <div class="d-flex justify-content-center">
-
-                <form method="GET" action="/login" style="padding: 1em;">
-                  <button type="submit" class="btn btn-primary">Sign In</button>
-                </form>
-                
-                <form method="GET" action="/register" style="padding: 1em;">
-                  <button type="submit" class="btn btn-primary">Register</button>
-                </form>
-                
-              </div>
-            </div>
+          <div class="card-header" text-muted" style=>
+                <h3 class="text-center mb-5">Please sign in to start using TinyApp.</h3>
           </div>
-          <% } %>
+            <% } %>
       </main>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
