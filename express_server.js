@@ -1,10 +1,11 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; 
-app.set("view engine", "ejs");
 const cookieParser = require('cookie-parser')
+const bodyParser = require("body-parser");
+app.set("view engine", "ejs");
 app.use(cookieParser())
-
+app.use(bodyParser.urlencoded({extended: true}));
 
 //DATA
 const urlDatabase = {
@@ -27,6 +28,26 @@ const users =
   }
 }
 
+//HELPER FUNCTION
+
+const getUserByEmail = (email) => {
+  const userIDs = Object.keys(users);
+  const userKeys = Object.values(users);
+  const allEmails = userKeys.map( userInfo => userInfo.email);
+  const returnUser = {};
+
+  console.log("all values***", userKeys );
+  console.log("all emails", allEmails);
+  
+    userIDs.forEach( id => {
+      if (users[id].email === email) {
+        returnUser.email = email;
+      };
+    });
+
+    return returnUser; 
+}
+
 function generateRandomString() {
   const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
   let randomString = "";
@@ -35,9 +56,6 @@ function generateRandomString() {
   }
   return randomString;
 }
-
-const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({extended: true}));
 
 //Home Page
 app.get("/", (req, res) => {
@@ -123,15 +141,25 @@ app.post("/register", (req, res) => {
   const newEmail = req.body.email;
   const newPassword = req.body.password;
   const newID = generateRandomString();
-  
-  users[newID] = {
-    id: newID, 
-    email: newEmail,
-    password: newPassword
+
+  if (!newEmail || !newPassword) {
+    res.send("Email and/or password cannot be left blank.")
+    res.sendStatus(400);
+  } else if (getUserByEmail(newEmail).email) {
+    res.send("This email is already registered with an account.")
+    res.sendStatus(400);
+  } else {
+    users[newID] = {
+      id: newID, 
+      email: newEmail,
+      password: newPassword
+    };
   };
 
   res.cookie("user_id", newID);
   res.redirect("/urls");
+  //console.log("getUserByEMAIL", getUserByEmail("user2RandomID").email);
+  
 });
 
 //Redirect any request to "/u/:shortURL" to its longURL
