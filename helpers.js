@@ -1,8 +1,6 @@
 const getUserByEmail = (email, database) => {
-
   const userIDs = Object.keys(database);
   const returnUser = {};
-  
     userIDs.forEach( id => {
       if (database[id].email === email) {
         returnUser.email = email;
@@ -33,4 +31,12 @@ function generateRandomString() {
   return randomString;
 }
 
-module.exports = {getUserByEmail, urlsForUser, generateRandomString};
+const doesTinyURLExist = (tinyURL, database) => {
+  const shortURLs = Object.keys(database);
+  if (shortURLs.includes(tinyURL)) {
+    return true;
+  }
+  return false;
+}
+
+module.exports = {getUserByEmail, urlsForUser, generateRandomString, doesTinyURLExist};

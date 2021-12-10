@@ -1,5 +1,4 @@
 const { assert } = require("chai");
-
 const { getUserByEmail, urlsForUser } = require("../helpers.js");
 
 const testURLs = {
@@ -46,7 +45,7 @@ describe("getUserByEmail", function() {
     const user = getUserByEmail("bob@mail.com", testUsers);
     assert.isEmpty(user);
   });
-});
+});h
 describe("urlsForUser", function() {
   it("should return object with an unregistered id", function() {
     const url = urlsForUser("555555", testURLs)

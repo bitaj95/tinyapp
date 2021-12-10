@@ -4,14 +4,14 @@ const PORT = 8080;
 const bodyParser = require("body-parser");
 const bcrypt = require('bcryptjs');
 const cookieSession = require('cookie-session');
-const {getUserByEmail, urlsForUser, generateRandomString} = require("./helpers.js");
+const {getUserByEmail, urlsForUser, generateRandomString, doesTinyURLExist} = require("./helpers.js");
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
   keys: [ "key1", "key2"],
-}))
+}));
 
 //DATA
 const urlDatabase = {};
@@ -72,12 +72,26 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = {
-    shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    user: users[req.session.user_id]
-  };
-  if (!templateVars.user) {
+  const doesURLExist = doesTinyURLExist(req.params.shortURL, urlDatabase);
+  let templateVars = {};
+
+  if (doesURLExist) {
+    templateVars = {
+      shortURL: req.params.shortURL, 
+      longURL: urlDatabase[req.params.shortURL].longURL,
+      user: users[req.session.user_id],
+      doesURLExist,
+    };
+  } else {
+      templateVars = {
+        doesURLExist,
+        user: users[req.session.user_id]
+      };
+    }
+
+  if(!doesTinyURLExist(req.params.shortURL, urlDatabase)) {
+    res.render("urls_show", templateVars);
+  } else if (!templateVars.user) {
     res.status(401).send("Please sign in to view this page");
   } else if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
     res.render("urls_show", templateVars);
