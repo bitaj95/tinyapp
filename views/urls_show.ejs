@@ -9,7 +9,7 @@
 <body>
   <%- include('partials/_header') %>
 
-  <% if (doesURLExist) { %>
+  <% if (doesURLExist && user) { %>
 
     <div class="card text-center">
         <div class="card-header"></div>
@@ -26,10 +26,14 @@
         </form>
       </div>
     </div>
-  
+
+  <% } else if (doesURLExist && !user) { %>
+    <div class="card-footer" style=>
+      <h3 class="text-center mb-5">Please log in to edit this tinyLink.</h3>
+    </div>
   <% } else { %>
     <div class="card-footer" style=>
-      <h3 class="text-center mb-5">Uh oh! This tinyURL does not exist.</h3>
+      <h3 class="text-center mb-5">Uh oh! This tinyLink does not exist.</h3>
     </div>
   <% } %>
     <!-- Bootstrap JS -->

@@ -55,7 +55,6 @@ app.get("/urls/new", (req, res) => {
 //Generate new shortURL, add to db.
 app.post("/urls", (req, res) => {
   const templateVars = {user: users[req.session.user_id]};
-
   if (!templateVars.user) {
     res.status(401).send("Please sign in to shorten a URL");
   } else {
@@ -73,6 +72,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const doesURLExist = doesTinyURLExist(req.params.shortURL, urlDatabase);
   let templateVars = {};
 
+  //templateVars key/values will depend on whether the tinyURL exists.
   if (doesURLExist) {
     templateVars = {
       shortURL: req.params.shortURL, 
@@ -88,13 +88,18 @@ app.get("/urls/:shortURL", (req, res) => {
       };
     }
 
+    //if tinyURL not valid, show html page informing user:
   if(!doesTinyURLExist(req.params.shortURL, urlDatabase)) {
-    //if tinyURL not valid, show html page informing user.
     res.render("urls_show", templateVars);
+    //else if user not logged in, show html page informing user.
   } else if (!templateVars.user) {
-    res.status(401).send("Please sign in to view this page");
-  } else if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
+    res.status(401);
     res.render("urls_show", templateVars);
+    //else if user is signed in, show html page that that lets them edit the tiny link.
+  } else if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
+    res.status(401);
+    res.render("urls_show", templateVars);
+    //the tiny code does not belong to user, show html page informing them they cannot edit.
   } else {
     res.status(401).send("Sorry, this is not your URL to edit.");
   }
