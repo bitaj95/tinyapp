@@ -26,14 +26,6 @@ app.get("/", (req, res) => {
   }
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-}); 
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
 app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlsForUser(req.session.user_id, urlDatabase),
@@ -88,20 +80,20 @@ app.get("/urls/:shortURL", (req, res) => {
       };
     }
 
-    //if tinyURL not valid, show html page informing user:
-  if(!doesTinyURLExist(req.params.shortURL, urlDatabase)) {
-    res.render("urls_show", templateVars);
-    //else if user not logged in, show html page informing user.
+    if(!doesTinyURLExist(req.params.shortURL, urlDatabase)) {
+      res.render("urls_show", templateVars);
+      //if tinyURL not valid, show html page informing user:
   } else if (!templateVars.user) {
-    res.status(401);
-    res.render("urls_show", templateVars);
-    //else if user is signed in, show html page that that lets them edit the tiny link.
+      res.status(401);
+      res.render("urls_show", templateVars);
+      //else if user not logged in, show html page informing user.
   } else if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
-    res.status(401);
-    res.render("urls_show", templateVars);
-    //the tiny code does not belong to user, show html page informing them they cannot edit.
+      res.status(401);
+      res.render("urls_show", templateVars);
+      //else if user is signed in, show html page that that lets them edit the tiny link.
   } else {
-    res.status(401).send("Sorry, this is not your URL to edit.");
+      res.status(401).send("Sorry, this is not your URL to edit.");
+      //the tiny code does not belong to user, show html page informing them they cannot edit.
   }
 });
 
