@@ -74,34 +74,44 @@ app.get("/urls/:shortURL", (req, res) => {
     };
   //if tinyURL not valid
   } else {
-      templateVars = {
-        doesURLExist,
-        user: users[req.session.user_id]
-      };
-    }
+    templateVars = {
+      doesURLExist,
+      user: users[req.session.user_id]
+    };
+  }
 
-    if(!doesTinyURLExist(req.params.shortURL, urlDatabase)) {
+  //if tinyURL not valid, show html page informing user:
+  if(!doesTinyURLExist(req.params.shortURL, urlDatabase)) {
       res.render("urls_show", templateVars);
-      //if tinyURL not valid, show html page informing user:
+    //else if user not logged in, show html page informing user.
   } else if (!templateVars.user) {
       res.status(401);
       res.render("urls_show", templateVars);
-      //else if user not logged in, show html page informing user.
+    //else if user is signed in, show html page that that lets them edit the tiny link.
   } else if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
       res.status(401);
       res.render("urls_show", templateVars);
-      //else if user is signed in, show html page that that lets them edit the tiny link.
-  } else {
-      res.status(401).send("Sorry, this is not your URL to edit.");
-      //the tiny code does not belong to user, show html page informing them they cannot edit.
+    //the tiny code does not belong to user, show html page informing them they cannot edit.
+    } else {
+      res.status(401);
+      res.render("urls_show", templateVars);
   }
 });
 
-//Removes existing shortened URLs from db
+//Removes existing short URLs from db
 app.post("/urls/:shortURL/delete", (req, res) => {
-  shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
-  res.redirect("/urls");
+  //if user is not logged in, display error message.
+  const yourURLs = urlsForUser(req.session.user_id, urlDatabase);
+  const shortURL = req.params.shortURL;
+
+  if (!users[req.session.user_id]) {
+    res.status(401).send("Please sign in to perform this action");
+  } else if (!Object.keys(yourURLs).includes(shortURL)) {
+    res.status(401).send("Sorry, this is not your URL to delete!");
+  } else {
+    delete urlDatabase[shortURL];
+    res.redirect("/urls");
+  }
 });
 
 //Updates URL resource
