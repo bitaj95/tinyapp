@@ -163,7 +163,7 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 });
 
-//Redirect any request to "/u/:shortURL" to its longURL
+//Redirect any request to "/u/:shortURL" to original URL
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(`http://${longURL}`)

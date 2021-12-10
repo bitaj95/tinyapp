@@ -1,6 +1,18 @@
-const { assert } = require('chai');
+const { assert } = require("chai");
 
-const { getUserByEmail } = require('../helpers.js');
+const { getUserByEmail, urlsForUser } = require("../helpers.js");
+
+const testURLs = {
+
+  b6UTxQ: {
+      longURL: "https://www.tsn.ca",
+      userID: "aJ48lW"
+  },
+  i3BoGr: {
+      longURL: "https://www.google.ca",
+      userID: "111111"
+  }
+};
 
 const testUsers = {
   "userRandomID": {
@@ -15,34 +27,33 @@ const testUsers = {
   }
 };
 
-describe('getUserByEmail', function() {
-  it('should return a user with valid email', function() {
+describe("getUserByEmail", function() {
+  it("should return a user with valid email", function() {
     const user = getUserByEmail("user@example.com", testUsers)
     const expectedUserID = "userRandomID";
     assert.equal(user.id, expectedUserID);
   });
-  it('should return password "dishwasher-funk" as password for user2@example.com', function() {
+  it("should return password 'dishwasher-funk' as password for user2@example.com", function() {
     const user = getUserByEmail("user2@example.com", testUsers)
     const expectedUserPassword = "dishwasher-funk";
     assert.equal(user.password, expectedUserPassword);
   });
-  it('should return object with an unregistered email', function() {
+  it("should return object with an unregistered email", function() {
     const user = getUserByEmail("bob@mail.com", testUsers);
     assert.isObject(user);
   });
-  it('should return *empty* object with an unregistered email', function() {
+  it("should return *empty* object with an unregistered email", function() {
     const user = getUserByEmail("bob@mail.com", testUsers);
     assert.isEmpty(user);
   });
 });
-
-describe('urlsForUser', function() {
-  it('should return object with an unregistered id', function() {
-    const user = getUserByEmail("555555", testUsers)
-    assert.isObject(user);
+describe("urlsForUser", function() {
+  it("should return object with an unregistered id", function() {
+    const url = urlsForUser("555555", testURLs)
+    assert.isObject(url);
   });
-  it('should return *empty* object with an unregistered id', function() {
-    const user = getUserByEmail("555555", testUsers)
-    assert.isEmpty(user);
+  it("should return *empty* object with an unregistered id", function() {
+    const url = urlsForUser("555555", testURLs)
+    assert.isEmpty(url);
   });
 });
