@@ -159,14 +159,14 @@ app.post("/register", (req, res) => {
       password: hashedPassword
     };
   };
-
   req.session["user_id"] = newID;
   res.redirect("/urls");
 });
 
 //Redirect any request to "/u/:shortURL" to its longURL
 app.get("/u/:shortURL", (req, res) => {
-  res.redirect(urlDatabase[req.params.shortURL]);
+  const longURL = urlDatabase[req.params.shortURL].longURL;
+  res.redirect(`http://${longURL}`)
 });
 
 app.listen(PORT, () => {
