@@ -1,3 +1,4 @@
+//Return user object when search by email
 const getUserByEmail = (email, database) => {
   const userIDs = Object.keys(database);
   const returnUser = {};
@@ -11,6 +12,7 @@ const getUserByEmail = (email, database) => {
     return returnUser; 
 }
 
+//Creates "filtered" obj containing only URLs that belong to user
 const urlsForUser = (id, database) => {
   const shortURLs = Object.keys(database);
   const filtered = {}
@@ -22,6 +24,7 @@ const urlsForUser = (id, database) => {
   return filtered;
 }
 
+//Generate 6 character random string
 function generateRandomString() {
   const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
   let randomString = "";
@@ -31,6 +34,7 @@ function generateRandomString() {
   return randomString;
 }
 
+//Checks to see if tinyURL link is valid or not
 const doesTinyURLExist = (tinyURL, database) => {
   const shortURLs = Object.keys(database);
   if (shortURLs.includes(tinyURL)) {

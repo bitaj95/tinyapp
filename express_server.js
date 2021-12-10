@@ -54,7 +54,6 @@ app.get("/urls/new", (req, res) => {
 
 //Generate new shortURL, add to db.
 app.post("/urls", (req, res) => {
-  console.log(req.body);
   const templateVars = {user: users[req.session.user_id]};
 
   if (!templateVars.user) {
@@ -62,7 +61,6 @@ app.post("/urls", (req, res) => {
   } else {
     const urlShort = generateRandomString();
     const urlLong = req.body.longURL;
-
     urlDatabase[urlShort] = {
       longURL: urlLong,
       userID: req.session.user_id
@@ -82,6 +80,7 @@ app.get("/urls/:shortURL", (req, res) => {
       user: users[req.session.user_id],
       doesURLExist,
     };
+  //if tinyURL not valid
   } else {
       templateVars = {
         doesURLExist,
@@ -90,6 +89,7 @@ app.get("/urls/:shortURL", (req, res) => {
     }
 
   if(!doesTinyURLExist(req.params.shortURL, urlDatabase)) {
+    //if tinyURL not valid, show html page informing user.
     res.render("urls_show", templateVars);
   } else if (!templateVars.user) {
     res.status(401).send("Please sign in to view this page");
