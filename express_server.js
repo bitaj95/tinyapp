@@ -48,7 +48,8 @@ app.get("/urls/new", (req, res) => {
 app.post("/urls", (req, res) => {
   const templateVars = {user: users[req.session.user_id]};
   if (!templateVars.user) {
-    res.status(401).send("Please sign in to shorten a URL");
+   
+    res.status(401).send("<html><body>Please sign in to shorten a URL</body></html>\n");
   } else {
     const urlShort = generateRandomString();
     const urlLong = req.body.longURL;
@@ -110,9 +111,9 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
 
   if (!users[req.session.user_id]) {
-    res.status(401).send("Please sign in to perform this action");
+    res.status(401).send("<html><body>Please sign in to perform this action.</body></html>\n");
   } else if (!Object.keys(yourURLs).includes(shortURL)) {
-    res.status(400).send("Sorry, this is not your URL to delete!");
+    res.status(400).send("<html><body>Sorry, this is not your URL to edit. </body></html>\n");
   } else {
     delete urlDatabase[shortURL];
     res.redirect("/urls");
@@ -142,9 +143,9 @@ app.post("/login", (req, res) => {
   const checkDatabase = getUserByEmail(emailEntered, users);
 
   if (!checkDatabase.email) {
-    res.status(403).send("Email was not found.");
+    res.status(403).send("<html><body> Email not found. </body></html>\n");
   } else if (!bcrypt.compareSync(passwordEntered, checkDatabase.password)) {
-    res.status(403).send("Password was incorrect.");
+    res.status(403).send("<html><body> Password was incorrect. </body></html>\n");
   } else {
     const userID = checkDatabase.id;
     req.session["user_id"] = userID;
@@ -175,9 +176,9 @@ app.post("/register", (req, res) => {
   const newID = generateRandomString();
 
   if (!newEmail || !newPassword) {
-    res.status(400).send("Email and/or password cannot be left blank.");
+    res.status(400).send("<html><body> Email and/or password cannot be left blank. </body></html>\n");
   } else if (getUserByEmail(newEmail, users).email) {
-    res.status(400).send("This email is already registered with an account.");
+    res.status(400).send("<html><body> This email is already registered with an account. </body></html>\n");
   } else {
     users[newID] = {
       id: newID,
