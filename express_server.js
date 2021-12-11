@@ -61,9 +61,9 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const doesURLExist = doesTinyURLExist(req.params.shortURL, urlDatabase);
-  const yourURLs = urlsForUser(req.session.user_id, urlDatabase);
   const shortURL = req.params.shortURL;
+  const doesURLExist = doesTinyURLExist(shortURL, urlDatabase);
+  const yourURLs = urlsForUser(req.session.user_id, urlDatabase);
   
   let templateVars = {};
 
@@ -71,7 +71,7 @@ app.get("/urls/:shortURL", (req, res) => {
   if (doesURLExist) {
     templateVars = {
       shortURL,
-      longURL: urlDatabase[req.params.shortURL].longURL,
+      longURL: urlDatabase[shortURL].longURL,
       user: users[req.session.user_id],
       doesURLExist,
       correctUser: true

@@ -12,7 +12,7 @@ const getUserByEmail = (email, database) => {
   return returnUser;
 };
 
-//Creates "filtered" obj containing only URLs that belong to user
+//Creates "filtered" object containing only URLs that belong to user
 const urlsForUser = (id, database) => {
   const shortURLs = Object.keys(database);
   const filtered = {};
