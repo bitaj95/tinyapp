@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const PORT = 8080; 
+const PORT = 8080;
 const bodyParser = require("body-parser");
 const bcrypt = require('bcryptjs');
 const cookieSession = require('cookie-session');
@@ -15,7 +15,7 @@ app.use(cookieSession({
 
 //DATA
 const urlDatabase = {};
-const users = {}
+const users = {};
 
 app.get("/", (req, res) => {
   const templateVars = {user: users[req.session.user_id]};
@@ -55,8 +55,8 @@ app.post("/urls", (req, res) => {
     urlDatabase[urlShort] = {
       longURL: urlLong,
       userID: req.session.user_id
-    } 
-    res.redirect(`/urls/${urlShort}`)
+    };
+    res.redirect(`/urls/${urlShort}`);
   }
 });
 
@@ -67,7 +67,7 @@ app.get("/urls/:shortURL", (req, res) => {
   //templateVars key/values will depend on whether the tinyURL exists.
   if (doesURLExist) {
     templateVars = {
-      shortURL: req.params.shortURL, 
+      shortURL: req.params.shortURL,
       longURL: urlDatabase[req.params.shortURL].longURL,
       user: users[req.session.user_id],
       doesURLExist,
@@ -81,20 +81,20 @@ app.get("/urls/:shortURL", (req, res) => {
   }
 
   //if tinyURL not valid, show html page informing user:
-  if(!doesTinyURLExist(req.params.shortURL, urlDatabase)) {
-      res.render("urls_show", templateVars);
+  if (!doesTinyURLExist(req.params.shortURL, urlDatabase)) {
+    res.render("urls_show", templateVars);
     //else if user not logged in, show html page informing user.
   } else if (!templateVars.user) {
-      res.status(401);
-      res.render("urls_show", templateVars);
+    res.status(401);
+    res.render("urls_show", templateVars);
     //else if user is signed in, show html page that that lets them edit the tiny link.
   } else if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
-      res.status(401);
-      res.render("urls_show", templateVars);
+    res.status(401);
+    res.render("urls_show", templateVars);
     //the tiny code does not belong to user, show html page informing them they cannot edit.
-    } else {
-      res.status(401);
-      res.render("urls_show", templateVars);
+  } else {
+    res.status(401);
+    res.render("urls_show", templateVars);
   }
 });
 
@@ -138,7 +138,7 @@ app.post("/login", (req, res) => {
 
   if (!checkDatabase.email) {
     res.status(403).send("Email was not found.");
-  } else if (!bcrypt.compareSync( passwordEntered, checkDatabase.password)) {
+  } else if (!bcrypt.compareSync(passwordEntered, checkDatabase.password)) {
     res.status(403).send("Password was incorrect.");
   } else {
     const userID = checkDatabase.id;
@@ -175,11 +175,11 @@ app.post("/register", (req, res) => {
     res.status(400).send("This email is already registered with an account.");
   } else {
     users[newID] = {
-      id: newID, 
+      id: newID,
       email: newEmail,
       password: hashedPassword
     };
-  };
+  }
   req.session["user_id"] = newID;
   res.redirect("/urls");
 });
@@ -187,7 +187,7 @@ app.post("/register", (req, res) => {
 //Redirect any request to "/u/:shortURL" to original URL
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(`http://${longURL}`)
+  res.redirect(`http://${longURL}`);
 });
 
 app.listen(PORT, () => {
