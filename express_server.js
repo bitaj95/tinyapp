@@ -107,7 +107,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   if (!users[req.session.user_id]) {
     res.status(401).send("Please sign in to perform this action");
   } else if (!Object.keys(yourURLs).includes(shortURL)) {
-    res.status(401).send("Sorry, this is not your URL to delete!");
+    res.status(400).send("Sorry, this is not your URL to delete!");
   } else {
     delete urlDatabase[shortURL];
     res.redirect("/urls");
