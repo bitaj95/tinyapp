@@ -9,7 +9,7 @@
 <body>
   <%- include('partials/_header') %>
 
-  <% if (doesURLExist && user) { %>
+  <% if (doesURLExist && user && correctUser) { %>
 
     <div class="card text-center">
         <div class="card-header"></div>
@@ -31,10 +31,14 @@
     <div class="card-footer" style=>
       <h3 class="text-center mb-5">Please log in to edit this tinyLink.</h3>
     </div>
-  <% } else { %>
+  <% } else if (doesURLExist && !correctUser) { %>
     <div class="card-footer" style=>
-      <h3 class="text-center mb-5">Uh oh! This tinyLink does not exist.</h3>
+      <h3 class="text-center mb-5">Sorry, this is not your URL to edit. </h3>
     </div>
+    <% } else { %>
+      <div class="card-footer" style=>
+        <h3 class="text-center mb-5"> Oops, this URL does not exist. </h3>
+      </div>
   <% } %>
     <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
