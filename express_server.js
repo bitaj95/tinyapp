@@ -193,7 +193,14 @@ app.post("/register", (req, res) => {
 //Redirect any request to "/u/:shortURL" to original URL
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(`http://${longURL}`);
+
+  if(!urlDatabase[req.params.shortURL]) {
+    res.status(404).send("<html><body> Sorry, the tiny URL entered was not valid. </body></html>\n")
+  } else if (longURL.includes("http")) {
+    res.redirect(longURL);
+  } else {
+    res.redirect(`http://${longURL}`);
+  }
 });
 
 app.listen(PORT, () => {
